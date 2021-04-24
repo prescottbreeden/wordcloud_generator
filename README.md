@@ -12,4 +12,4 @@ requirements:
 2) run `node script.js`
 3) run `python run.py`
 
-note: large code bases can take 5 to 15 minutes to complete as none of the python code is optimized
+note: large code bases can take 5 to 15 minutes to generate the word cloud, pro tip, take a gander at the csv output before you run the python to do some quick weeding unless you really want "var" or "const" to dwarf your domain specific words
