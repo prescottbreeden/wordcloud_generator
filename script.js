@@ -1,6 +1,7 @@
 (async () => {
   const fs = require('fs');
   const path = require('path')
+  const exclude = require('./exclude');
 
   const generateString = async (path) => {
     try {
@@ -8,99 +9,29 @@
       const data = await fs.promises.readFile(path, 'utf-8');
       const res = JSON.stringify(data);
       const clean = res
-        .trim()
-        .replace(/\W/g, " ")
-        .replace(/\sn\s/g, " ")
-      const exclude = [
-        'action',
-        'application',
-        'connect',
-        'mapstatetoprops',
-        'act',
-        'background',
-        'boolean',
-        'catch',
-        'classname',
-        'color',
-        'common',
-        'component',
-        'components',
-        'const',
-        'constants',
-        'credits__input',
-        'current',
-        'date',
-        'default',
-        'div',
-        'expect',
-        'export',
-        'false',
-        'fetch',
-        'flex',
-        'flexgroup',
-        'flexrow',
-        'font',
-        'fragment',
-        'from',
-        'h1',
-        'h2',
-        'h3',
-        'id',
-        'im',
-        'import',
-        'json',
-        'label',
-        'n',
-        'nclass',
-        'nconst',
-        'new',
-        'nexport',
-        'nfunction',
-        'nimport',
-        'nlet',
-        'ntype',
-        'null',
-        'number',
-        'onchange',
-        'p',
-        'fc',
-        'err',
-        'param',
-        'display: flex',
-        'paper',
-        'testrunner',
-        'parse',
-        'react',
-        'recordselector',
-        'redux',
-        'renderdata',
-        'result',
-        'result',
-        'return',
-        'returns',
-        'size',
-        'state',
-        'string',
-        'stringify',
-        't',
-        'tobe',
-        'tobe',
-        'tojson',
-        'true',
-        'u',
-        'undefined',
-        'unknown',
-        'url',
-        'useeffect',
-        'usestate',
-        'value',
-        'w',
-        'will',
-      ];
+        .replace(/_/g, " ")
+        .replace(/\W/g, " ");
       const output = clean.split(' ')
         .map(x => x.toLowerCase())
-        .filter(val => !!val && !exclude.includes(val))
-        .join(',');
+        .filter(val => !!val)
+        .filter(val => val.length > 2)
+        .filter(val => !(/u00/).test(val))
+        .filter(val => !(/^00\w+/).test(val))
+        .filter(val => !(/\w+id$/).test(val))
+        .filter(val => !(/params?\w+/).test(val))
+        .filter(val => !(/upsert?\w+/).test(val))
+        .filter(val => !(/base?\w+/).test(val))
+        .filter(val => !(/validation?\w+/).test(val))
+        .filter(val => !(/\w+offset/).test(val))
+        .filter(val => !(/[0-9]+rem$/).test(val))
+        .filter(val => !(/[0-9]+px/).test(val))
+        .filter(val => !(/^get\w+/).test(val))
+        .filter(val => !(/^set\w+/).test(val))
+        .filter(val => !(/^is\w+/).test(val))
+        .filter(val => !(/^sidenav\w+/).test(val))
+        .filter(val => isNaN(val))
+        .filter(val => !exclude.includes(val))
+        .join(' ');
       return output;
     }
     catch (e) {
@@ -131,7 +62,7 @@
 
   const start = path.join(__dirname, 'src');
   const result = await(readDir(start));
-  await fs.promises.writeFile(__dirname + '/output.csv', result.join('')); 
+  await fs.promises.writeFile(__dirname + '/output.txt', result.join('')); 
 
 })();
 
